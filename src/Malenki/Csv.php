@@ -30,8 +30,10 @@ namespace Malenki;
 /**
  * @brief Prend en charge les fichiers CSV.
  */
-class ParserCsv {
-    const SEPARATOR = '|'; //!< Séparateur de champ par défaut
+class Csv 
+{
+    const SEPARATOR = ','; //!< Séparateur de champ par défaut
+
 
     private $file      = null;            //!< Nom du fichier CSV
     private $separator = self::SEPARATOR; //!< Le séparateur utilisé
@@ -39,6 +41,8 @@ class ParserCsv {
     private $lines     = 0;               //!< Le nombre de lignes du fichier
     private $content   = null;            //!< Tableau des valeurs du fichier
     private $goodcsv   = false;           //!< Information sur la validité du fichier
+
+
 
     /**
      * @brief Le constructeur
@@ -49,14 +53,20 @@ class ParserCsv {
      * Pour savoir si le fichier est valide, après l’appel du constructeur, il 
      * faut utiliser la méthode $this->isGoodCsv().
      */
-    public function __construct($file){
-        if(file_exists($file)){
+    public function __construct($file)
+    {
+        if(file_exists($file))
+        {
             $this->file = $file;
             $this->isWellFormed();
-        } else {
+        }
+        else
+        {
             $this->goodcsv = false;
         }
     }
+
+
 
     /**
      * @brief Détermine si un nombre donné est bien compris dans l’intervalle des index de lignes.
@@ -64,12 +74,19 @@ class ParserCsv {
      * @param $integer Un entier
      * @return Booléen
      */
-    private function isInRangeOfRows($integer){
+    private function isInRangeOfRows($integer)
+    {
         if($integer >= 0 and $integer < $this->lines)
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
+
+
 
     /**
      * @brief Détermine si un nombre donné correspond à un index possible pour un champ du fichier.
@@ -77,12 +94,19 @@ class ParserCsv {
      * @param $integer Un entier
      * @return Booléen
      */
-    private function isInRangeOfFields($integer){
+    private function isInRangeOfFields($integer)
+    {
         if($integer >= 0 and $integer < $this->fields)
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
+
+
 
     /**
      * @brief Teste si le fichier est un CSV correct.
@@ -94,31 +118,39 @@ class ParserCsv {
      * comme le nombre de champs du fichier, le nombre de lignes et le contenu du 
      * fichier dans un tableau.
      */
-    private function isWellFormed(){
-        if(!is_null($this->file)){
+    private function isWellFormed()
+    {
+        if(!is_null($this->file))
+        {
             $lines = file($this->file, FILE_IGNORE_NEW_LINES);
-            $nbl   = count($lines);
 
-            for ($i = 0 ; $i < $nbl ; $i++){
+            foreach ($lines as $i => $line)
+            {
                 if($i > 0)
                     $nbs2 = $nbs1;
 
-                $nbs1 = substr_count($lines[$i], $this->separator);
+                $nbs1 = substr_count($line, $this->separator);
 
-                if($i > 0 and $nbs1 != $nbs2)
+                if($i > 0 && $nbs1 != $nbs2)
+                {
                     $this->goodcsv = false;
+                }
             }
 
             // comme c’est bon, on connaît le nombre de champs
             $this->fields  = $nbs1 + 1;
             // on a le nombre de lignes aussi
-            $this->lines   = $nbl;
+            $this->lines   = count($lines);
             $this->content = $lines;
             $this->goodcsv = true;
-        } else {
+        }
+        else
+        {
             $this->goodcsv = false;
         }
     }
+
+
 
     /**
      * @brief Détermine si le fichier est un bon CSV
@@ -128,44 +160,59 @@ class ParserCsv {
      *
      * @return Booléen
      */
-    public function isGoodCsv(){
+    public function isGoodCsv()
+    {
         return $this->goodcsv;
     }
+
+
 
     /**
      * @brief Détermine le caractère séparateur de champs
      *
      * Fixe le caractère séparateur utilisé dans le fichier CSV.
-     * Si aucune valeur n’est fournie, le caractère utilisé est un point virgule.
+     * Si aucune valeur n’est fournie, le caractère utilisé est une point virgule.
      *
      * @param $separator 
      */
-    public function setSeparator($separator = ';'){
-        if(strlen(trim($separator)) == 1 and !is_null($separator)){
+    public function setSeparator($separator = ';')
+    {
+        if(strlen(trim($separator)) == 1 && !is_null($separator))
+        {
             $this->separator = $separator;
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
+
+
 
     /**
      * @brief Retourne le nombre de lignes du fichier.
      *
      * @return Entier
      */
-    public function getNumberOfLines(){
+    public function getNumberOfLines()
+    {
         return $this->lines;
     }
+
+
 
     /**
      * @brief Retourne le nombre de champs du fichier.
      *
      * @return Entier
      */
-    public function getNumberOfFields(){
+    public function getNumberOfFields()
+    {
         return $this->fields;
     }
+
+
 
     /**
      * @brief Retourne un tableau de la ligne choisie.
@@ -175,15 +222,24 @@ class ParserCsv {
      *
      * @return Tableau ou booléen 
      */
-    public function getLine($number){
+    public function getLine($number)
+    {
         if(is_null($this->content))
+        {
             return false;
+        }
 
         if($this->isInRangeOfRows($number))
+        {
             return explode($this->separator,$this->content[$number]);
+        }
         else
+        {
             return false;
+        }
     }
+
+
 
     /**
      * @brief Retourne le contenu d’un champ à une ligne précise.
@@ -193,15 +249,21 @@ class ParserCsv {
      *
      * @return Chaîne de caractères ou booléen
      */
-    public function getFieldAtLine($field, $line){
-        if($this->isInRangeOfFields($field)){
+    public function getFieldAtLine($field, $line)
+    {
+        if($this->isInRangeOfFields($field))
+        {
             $row = $this->getLine($line);
 
             if($row === false)
+            {
                 return false;
+            }
 
             return $row[$field];
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
