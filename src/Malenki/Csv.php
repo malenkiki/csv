@@ -76,7 +76,7 @@ class Csv
      */
     private function isInRangeOfRows($integer)
     {
-        if($integer >= 0 and $integer < $this->lines)
+        if($integer >= 0 && $integer < $this->lines)
         {
             return true;
         }
@@ -96,7 +96,7 @@ class Csv
      */
     private function isInRangeOfFields($integer)
     {
-        if($integer >= 0 and $integer < $this->fields)
+        if($integer >= 0 && $integer < $this->fields)
         {
             return true;
         }
