@@ -28,25 +28,76 @@ namespace Malenki;
 
 
 /**
- * @brief Prend en charge les fichiers CSV.
+ * Class to play with CSV file.
  */
 class Csv 
 {
-    const SEPARATOR = ','; //!< Séparateur de champ par défaut
+    /**
+     * Default field’s separator 
+     */
+    const SEPARATOR = ',';
 
 
-    private $file      = null;            //!< Nom du fichier CSV
-    private $separator = self::SEPARATOR; //!< Le séparateur utilisé
-    private $fields    = 0;               //!< Le nombre de champs du fichier
-    private $lines     = 0;               //!< Le nombre de lignes du fichier
-    private $content   = null;            //!< Tableau des valeurs du fichier
-    private $goodcsv   = false;           //!< Information sur la validité du fichier
+    /**
+     * CSV file’s name 
+     * 
+     * @var string
+     * @access private
+     */
+    private $file = null;
+
+
+    /**
+     * custom separator
+     * 
+     * @var string
+     * @access private
+     */
+    private $separator = self::SEPARATOR;
 
 
 
     /**
-     * @brief Le constructeur
-     *
+     * fields counter 
+     * 
+     * @var integer
+     * @access private
+     */
+    private $fields = 0;
+
+
+
+    /**
+     * lines counter 
+     * 
+     * @var integer
+     * @access private
+     */
+    private $lines = 0;
+
+
+
+    /**
+     * Array with file’s values 
+     * 
+     * @var array
+     * @access private
+     */
+    private $content = null;
+    
+    
+    
+    /**
+     * CSV valid or not? 
+     * 
+     * @var boolean
+     * @access private
+     */
+    private $goodcsv = false;
+
+
+
+    /**
      * Prend obligatoirement en argument le nom du fichier CSV. Si le fichier 
      * existe, il est aussitôt lu pour déterminer sa validité : s’il est valide,
      * les différentes valeurs sont stockées et sont accessibles.
