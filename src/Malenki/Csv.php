@@ -29,6 +29,10 @@ namespace Malenki;
 
 /**
  * Class to play with CSV file.
+ * @todo clean and modernize this…
+ * @todo add method to change lines to rows or rows to lines
+ * @todo translate into english!
+ * @author Michel Petit <petit.michel@gmail.com> 
  */
 class Csv 
 {
@@ -174,6 +178,7 @@ class Csv
         if(!is_null($this->file))
         {
             $lines = file($this->file, FILE_IGNORE_NEW_LINES);
+            $this->goodcsv = true;
 
             foreach ($lines as $i => $line)
             {
@@ -193,12 +198,14 @@ class Csv
             // on a le nombre de lignes aussi
             $this->lines   = count($lines);
             $this->content = $lines;
-            $this->goodcsv = true;
+
         }
         else
         {
             $this->goodcsv = false;
         }
+
+        return $this->goodcsv;
     }
 
 
