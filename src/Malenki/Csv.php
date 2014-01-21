@@ -48,7 +48,7 @@ class Csv
      * @var string
      * @access private
      */
-    private $file = null;
+    private $str_file = null;
 
 
     /**
@@ -57,27 +57,27 @@ class Csv
      * @var string
      * @access private
      */
-    private $separator = self::SEPARATOR;
+    private $chr_separator = self::SEPARATOR;
 
 
 
     /**
-     * fields counter 
+     * Fields counter 
      * 
      * @var integer
      * @access private
      */
-    private $fields = 0;
+    private $int_fields = 0;
 
 
 
     /**
-     * lines counter 
+     * Lines counter 
      * 
      * @var integer
      * @access private
      */
-    private $lines = 0;
+    private $int_lines = 0;
 
 
 
@@ -87,7 +87,7 @@ class Csv
      * @var array
      * @access private
      */
-    private $content = null;
+    private $arr_content = array();
     
     
     
@@ -97,28 +97,17 @@ class Csv
      * @var boolean
      * @access private
      */
-    private $goodcsv = false;
+    private $bool_goodcsv = false;
 
 
 
     /**
-     * Prend obligatoirement en argument le nom du fichier CSV. Si le fichier 
-     * existe, il est aussitôt lu pour déterminer sa validité : s’il est valide,
-     * les différentes valeurs sont stockées et sont accessibles.
-     * Pour savoir si le fichier est valide, après l’appel du constructeur, il 
-     * faut utiliser la méthode $this->isGoodCsv().
+     * Constructor
      */
     public function __construct($file)
     {
-        if(file_exists($file))
-        {
-            $this->file = $file;
-            $this->isWellFormed();
-        }
-        else
-        {
-            $this->goodcsv = false;
-        }
+        $this->str_file = $file;
+        $this->isWellFormed();
     }
 
 
@@ -127,11 +116,11 @@ class Csv
      * @brief Détermine si un nombre donné est bien compris dans l’intervalle des index de lignes.
      *
      * @param $integer Un entier
-     * @return Booléen
+     * @return boolean
      */
     private function isInRangeOfRows($integer)
     {
-        if($integer >= 0 && $integer < $this->lines)
+        if($integer >= 0 && $integer < $this->int_lines)
         {
             return true;
         }
@@ -151,7 +140,7 @@ class Csv
      */
     private function isInRangeOfFields($integer)
     {
-        if($integer >= 0 && $integer < $this->fields)
+        if($integer >= 0 && $integer < $this->int_fields)
         {
             return true;
         }
@@ -175,137 +164,118 @@ class Csv
      */
     private function isWellFormed()
     {
-        if(!is_null($this->file))
+        $this->bool_goodcsv = true;
+
+        if(!is_null($this->str_file))
         {
-            $lines = file($this->file, FILE_IGNORE_NEW_LINES);
-            $this->goodcsv = true;
+            $lines = file($this->str_file, FILE_IGNORE_NEW_LINES);
 
             foreach ($lines as $i => $line)
             {
                 if($i > 0)
                     $nbs2 = $nbs1;
 
-                $nbs1 = substr_count($line, $this->separator);
+                $nbs1 = substr_count($line, $this->chr_separator);
 
                 if($i > 0 && $nbs1 != $nbs2)
                 {
-                    $this->goodcsv = false;
+                    $this->bool_goodcsv = false;
                 }
             }
 
             // comme c’est bon, on connaît le nombre de champs
-            $this->fields  = $nbs1 + 1;
+            $this->int_fields  = $nbs1 + 1;
             // on a le nombre de lignes aussi
-            $this->lines   = count($lines);
-            $this->content = $lines;
-
+            $this->int_lines   = count($lines);
+            $this->arr_content = $lines;
         }
-        else
-        {
-            $this->goodcsv = false;
-        }
-
-        return $this->goodcsv;
     }
 
 
 
     /**
-     * @brief Détermine si le fichier est un bon CSV
+     * Checks whether CSV file is welldone.
      *
-     * Si le fichier est une bon fichier CSV, alors retourne @c vrai, et @c faux 
-     * dans le cas contraire.
-     *
-     * @return Booléen
+     * @return boolean
      */
-    public function isGoodCsv()
+    public function isValid()
     {
-        return $this->goodcsv;
+        return $this->bool_goodcsv;
     }
 
 
 
     /**
-     * @brief Détermine le caractère séparateur de champs
+     * Set separator character.
      *
-     * Fixe le caractère séparateur utilisé dans le fichier CSV.
-     * Si aucune valeur n’est fournie, le caractère utilisé est une point virgule.
-     *
-     * @param $separator 
+     * @param string $separator 
      */
     public function setSeparator($separator = ';')
     {
-        if(strlen(trim($separator)) == 1 && !is_null($separator))
+        if(is_string($separator) && strlen(trim($separator)) == 1 && !is_null($separator))
         {
-            $this->separator = $separator;
-            return true;
+            $this->chr_separator = trim($separator);
         }
         else
         {
-            return false;
+            throw \InvalidArgumentException('Separator must be a valid character');
         }
     }
 
 
 
     /**
-     * @brief Retourne le nombre de lignes du fichier.
+     * Get amount of lines
      *
-     * @return Entier
+     * @return Integer
      */
     public function getNumberOfLines()
     {
-        return $this->lines;
+        return $this->int_lines;
     }
 
 
 
     /**
-     * @brief Retourne le nombre de champs du fichier.
+     * Get amount of fields.
      *
-     * @return Entier
+     * @return Integer
      */
     public function getNumberOfFields()
     {
-        return $this->fields;
+        return $this->int_fields;
     }
 
 
 
     /**
-     * @brief Retourne un tableau de la ligne choisie.
+     * Get one line as array.
      *
-     * Retourne un @c tableau si tout va bien, dans le cas contraire, retourne le
-     * booléen @c false.
-     *
-     * @return Tableau ou booléen 
+     * @return array 
      */
     public function getLine($number)
     {
-        if(is_null($this->content))
+        if(count($this->arr_content) == 0)
         {
-            return false;
+            throw new \Exception('CSV file is void!');
         }
 
         if($this->isInRangeOfRows($number))
         {
-            return explode($this->separator,$this->content[$number]);
+            return explode($this->chr_separator, $this->arr_content[$number]);
         }
         else
         {
-            return false;
+            throw new \OutOfRangeException('Row is out of range!');
         }
     }
 
 
 
     /**
-     * @brief Retourne le contenu d’un champ à une ligne précise.
+     * Get field content at a specific line.
      *
-     * Retourne la valeur si tout va bien, ou un booléen @c false dans le cas
-     * contraire.
-     *
-     * @return Chaîne de caractères ou booléen
+     * @return string
      */
     public function getFieldAtLine($field, $line)
     {
@@ -313,16 +283,11 @@ class Csv
         {
             $row = $this->getLine($line);
 
-            if($row === false)
-            {
-                return false;
-            }
-
             return $row[$field];
         }
         else
         {
-            return false;
+            throw new \OutOfRangeException('Field is out of range!');
         }
     }
 }
